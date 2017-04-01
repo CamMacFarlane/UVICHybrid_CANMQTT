@@ -4,11 +4,21 @@ import paho.mqtt.publish as publish
 HOST = "10.42.0.1"
 PORTNUM = 1884
 
+
+
 #CAN ID definitions 
-ENGINE_SIGNALS_ID = 0x0070
+ENGINE_SIGNALS_ID = 0x100
 WARNINGS_ID = 0x200
 ELECTRICAL_SYSTEMS_ID = 0x300
 CONTROL_ID = 0x400
+
+#Warning Bits
+ESS_OVER_TEMP   =  0b00000001
+FUEL_LEVEL_LOW  =  0b00000010
+GLV_COCKPIT_BRB =  0b00000100
+GLV_SOC_LOW     =  0b00001000
+MOTOR_OVER_TEMP =  0b00010000
+TRANSMISION     =  0b00100000
 
 KNOWN_TOPICS = {'engine_singals_messsage','warnings_message', 'electircal_systems_message', 'control_message'}
 
@@ -23,12 +33,21 @@ IDtoTopic = {
 def two8BitTo16bit(byte1,byte2):
     return ((byte1<<8)|byte2)
 
+def formatWARNING_SIGNALS(msg):
+    data = msg.data[0]
+    stringData =  "Ess Over temp = " + str( bool( data&ESS_OVER_TEMP!= 0 )) + ", "
+    stringData +=  "Fuel Level Low = " + str((data&FUEL_LEVEL_LOW != 0 )) + ", "
+    stringData +=  "GLV cockpit brb  = " + str((data&GLV_COCKPIT_BRB != 0)) + ", "
+    stringData +=  "GLV SOC low = " + str((data&GLV_SOC_LOW != 0)) + ", "
+    stringData +=  "Motor over temp = " + str((data&MOTOR_OVER_TEMP!= 0)) + ", "    
+    stringData +=  "Transmission warn = " + str(bool(data&TRANSMISION != 0)) + ", "
+    return stringData
+
 def formatENGINE_SIGNALS(msg):
-    stringData =  "Engine coolant = " + str(msg.data[0]) + " "
-    stringData += "Engine Torque = " + str(msg.data[1]) + " "
-    stringData += "Engine RPM = " + str(two8BitTo16bit(msg.data[2],msg.data[3])) + " "
-    stringData += "Throttle Percent = " + str(msg.data[4]) + " "
-    print("yes in here")
+    stringData =  "Engine coolant = " + str(msg.data[0]) + ", "
+    stringData += "Engine Torque = " + str(msg.data[1]) + ", "
+    stringData += "Engine RPM = " + str(two8BitTo16bit(msg.data[2],msg.data[3])) + ", "
+    stringData += "Throttle Percent = " + str(msg.data[4]) + ", "
     return stringData
 
 def formatKnownID(msg, ID):
@@ -36,6 +55,8 @@ def formatKnownID(msg, ID):
     # print("id = " + str(ID))
     if(ID == ENGINE_SIGNALS_ID):
         formattedData = formatENGINE_SIGNALS(msg)
+    elif (ID == WARNINGS_ID):
+        formattedData = formatWARNING_SIGNALS(msg)
     return formattedData 
 
 """ Takes a CAN message stuct and pulishes its data to the topic associated with its CAN ID if the CAN ID does not have an associated topic 
@@ -64,12 +85,13 @@ def publishData(data, topic):
 
 can_interface = 'can0'
 bus = can.interface.Bus(can_interface, bustype='socketcan_native')
-message = bus.recv(1.0)  # Timeout in seconds.
+while True:
+    message = bus.recv(1.0)  # Timeout in seconds.
 
-if message is None:
-    print('Timeout occurred, no message.')
-else:
-    print(message)
-    processMessage(message)
-    str = str(message.data)
-    print(str)
+    if message is None:
+        print('Timeout occurred, no message.')
+    else:
+        print(message)
+        processMessage(message)
+        string = str(message.data)
+        print(string)
