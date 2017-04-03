@@ -75,9 +75,9 @@ def processMessage(msg):
     else:
         for i in range(0, message.dlc):
              publishData(hex(message.data[i]), topic)    
-
-    print(topic)
-    print(message.data)
+    print("Published: ", message.data, "to ", topic, " topic")
+    # print(topic)
+    # print(message.data)
     
 def publishData(data, topic):
     # publish.single("CANDUMP", data, hostname=HOST ,port=PORTNUM)
@@ -91,7 +91,7 @@ while True:
     if message is None:
         print('Timeout occurred, no message.')
     else:
-        print(message)
+        # print(message)
         processMessage(message)
-        string = str(message.data)
-        print(string)
+        # string = str(message.data)
+        # print(string)
