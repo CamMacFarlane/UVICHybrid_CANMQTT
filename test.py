@@ -49,12 +49,33 @@ def formatENGINE_SIGNALS(msg):
     stringData += "Engine RPM = " + str(two8BitTo16bit(msg.data[2],msg.data[3])) + ", "
     stringData += "Throttle Percent = " + str(msg.data[4]) + ", "
     return stringData
+#matt
+def formatELECTRICAL_SIGNALS(msg):
+    stringData += "ESS SOC = " + str(msg.data[0]) + ", "
+    stringData += "ESS Voltage" + str(msg.data[1] + ", "
+    return stringData 
+    
+def formatCONTROL_SIGNALS(msg):
+    first_msg = str(msg.data[0])
+    stringData = "Current cont = " + first_msg[:2]
+    stringData += "Current gear = " + first_msg[2:6]
+    stringData += "Vehicle Speed = " + str(msg.data[1])
+    stringData += "Energy Above = " + str(msg.data[2])
+    return stringData
+#
 
 def formatKnownID(msg, ID):
     formattedData = "null"
     # print("id = " + str(ID))
     if(ID == ENGINE_SIGNALS_ID):
         formattedData = formatENGINE_SIGNALS(msg)
+    
+    #matt
+    elif(ID == ELECTRICAL_SYSTEMS_ID):
+        fommattedData = formatELECTRICAL_SIGNALS(msg)
+    elif(ID == CONTROL_ID):
+        formmatedData = formatCONTROL_SIGNALS(msg)
+    #
     elif (ID == WARNINGS_ID):
         formattedData = formatWARNING_SIGNALS(msg)
     return formattedData 
