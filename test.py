@@ -52,9 +52,9 @@ def formatENGINE_SIGNALS(msg):
 #matt
 def formatELECTRICAL_SIGNALS(msg):
     stringData += "ESS SOC = " + str(msg.data[0]) + ", "
-    stringData += "ESS Voltage" + str(msg.data[1] + ", "
-    return stringData 
-    
+    stringData += "ESS Voltage" + str(msg.data[1]) + ", "
+    return stringData
+
 def formatCONTROL_SIGNALS(msg):
     first_msg = str(msg.data[0])
     stringData = "Current cont = " + first_msg[:2]
@@ -62,7 +62,6 @@ def formatCONTROL_SIGNALS(msg):
     stringData += "Vehicle Speed = " + str(msg.data[1])
     stringData += "Energy Above = " + str(msg.data[2])
     return stringData
-#
 
 def formatKnownID(msg, ID):
     formattedData = "null"

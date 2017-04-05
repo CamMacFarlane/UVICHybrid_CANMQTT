@@ -36,15 +36,35 @@ uint8_t rpm1 = 10;
 uint8_t rpm2 = 0;
 uint8_t throttle = 40;
 uint8_t warnings = 0;
+
+uint8_t ess_soc = 10;
+uint8_t ess_voltage = 10;
+
+uint8_t current_cont = 0;
+uint8_t current_gear = 1;
+uint8_t vehicle_speed = 30;
+uint8_t energy_ab = 10;
+
+
 unsigned char engineSignals[5] = {0, 0, 0, 0, 0};
 unsigned char warningSignals[1] = {0};
+unsigned char electricalSignals[2] = {0,0};
+unsigned char controlSignals[4] = {0,0,0};
 
 void loop()
 {   Serial.println("In loop");
     // send data:  id = 0x00, standard frame, data len = 8, stmp: data buf
     CAN.sendMsgBuf(ENGINE_SIGNALS_ID,0, 8, engineSignals);
     CAN.sendMsgBuf(WARNINGS_ID,0, 8, warningSignals);
-    warningSignals[0] = warnings++;
+	CAN.sendMsgBif(ElECTRICAL_SYSTEMS_ID, 0, 8, electricalSignals);
+	CAN.sendMsgBif(CONTROL_ID, 0, 8, controlSignals);
+	electricalSignals[0] = ess_soc++;
+	electricalSiganls[1] = ess_volatage++;
+	controlSignals[0] = curr_cont++;
+	controlSignals[0] = current_gear++;
+	controlSignals[1] = vehicle_speed++;
+	controlSignals[2] = energy_ab++;
+	warningSignals[0] = warnings++;
     engineSignals[0] = coolant++;
     engineSignals[1] = torque++;
     engineSignals[2] = rpm1++;
